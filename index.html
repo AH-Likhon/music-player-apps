@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player Apps</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="main_div">
+        <div class="music_container">
+            <h2 id="title">Tomar Jonno</h2>
+            <h3 id="artist">Balam</h3>
+            <div class="img_container">
+                <img src="images/audio-1.jpg" alt="">
+            </div>
+            <audio src="music/audio-1.mp3"></audio>
+
+            <!--ProgessBar-->
+            <div class="progressbar_container" id="progresss_container">
+                <div class="progress_duration_meter">
+                    <div id="current_time">
+                        0:00
+                    </div>
+                    <div id="duration_total">
+                        5:18
+                    </div>
+                </div>
+
+                <div class="progress_div" id="progress_div">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+
+            <!--Controls-->
+            <div class="music_controls">
+                <i class="fas fa-backward" id="prev" title="Previous"></i>
+                <i class="fas fa-play main_button" id="play" title="Play"></i>
+                <i class="fas fa-forward" id="next" title="Next"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const music = document.querySelector('audio');
+        const img = document.querySelector('img');
+        const play = document.getElementById('play');
+        const title = document.getElementById('title');
+        const artist = document.getElementById('artist');
+        const prev = document.getElementById('prev');
+        const next = document.getElementById('next');
+
+        let progress = document.getElementById('progress');
+        let duration_total = document.getElementById('duration_total');
+        let current_time = document.getElementById('current_time');
+
+        const progress_div = document.getElementById('progress_div');
+
+        const songs = [
+            {
+            name: "audio-1",
+            title: "Tomar Jonno", 
+            artist: "Balam",
+            },
+            {
+            name: "audio-2",
+            title: "Din Gelo", 
+            artist: "Habib",
+            },
+            {
+            name: "audio-3",
+            title: "Sun Raha He", 
+            artist: "Ashiqui-2",
+            },
+        ];
+
+        let ispPlaying = false;
+
+        //for play functionality
+
+        /* play.addEventListener("click", () => {
+            ispPlaying = true;
+            music.play();
+            play.classList.replace("fa-play","fa-pause");
+            img.classList.add('anime');
+        })*/
+
+        const playMusic = () => {
+            ispPlaying = true;
+            music.play();
+            play.classList.replace("fa-play","fa-pause");
+            img.classList.add('anime');
+        };
+
+        //for pause functionality
+
+        /* play.addEventListener("click", () => {
+            ispPlaying = false;
+            music.play();
+            play.classList.replace("fa-play","fa-pause");
+            img.classList.add('anime');
+        }) */
+
+        const pauseMusic = () => {
+            ispPlaying = false;
+            music.pause();
+            play.classList.replace("fa-pause", "fa-play");
+            img.classList.remove('anime');
+        };
+
+        play.addEventListener("click", () => {
+            /*if(ispPlaying){
+                pauseMusic();
+            }else{
+                playMusic();
+            }*/
+
+            ispPlaying ? pauseMusic() : playMusic();
+        });
+
+        //change music data
+        const loadSong = (songs) => {
+            title.textContent = songs.title;
+            artist.textContent = songs.artist;
+            music.src = "music/" + songs.name + ".mp3";
+            img.src = "images/" + songs.name + ".jpg";
+        };
+
+        //loadSong(songs[2]);
+
+        songIndex = 0;
+
+        const nextSong = () => {
+            songIndex = (songIndex + 1) % songs.length;
+            loadSong(songs[songIndex]);
+            playMusic();
+        }
+        const prevSong = () => {
+            songIndex = (songIndex - 1 + songs.length) % songs.length;
+            loadSong(songs[songIndex]);
+            playMusic();
+        }
+
+        //progress js start
+        music.addEventListener("timeupdate",(event) => {
+            const {currentTime, duration} = event.srcElement;
+
+            let progress_time = (currentTime / duration) * 100;
+            progress.style.width = `${progress_time}%`;
+
+
+            //music time update
+
+            let min_duration = Math.floor(duration / 60);
+            let sec_duration = Math.floor(duration % 60);
+
+            let display_duration = `${min_duration}:${sec_duration}`;
+
+            if(duration){
+                duration_total.textContent = `${display_duration}`;
+            }
+
+            //current duration update
+
+            let min_currentTime = Math.floor(currentTime / 60);
+            let sec_currentTime = Math.floor(currentTime % 60);
+
+            if(sec_currentTime < 10){
+                sec_currentTime = `0${sec_currentTime}`;
+            }
+
+            let display_currentTime = `${min_currentTime}:${sec_currentTime}`;
+
+            if(currentTime){
+                current_time.textContent = `${display_currentTime}`;
+            }
+
+        });
+
+        //progress onclick functionality
+        progress_div.addEventListener("click", (event) => {
+            const { duration } = music;
+
+            let move_progress = (event.offsetX / event.srcElement.clientWidth) * duration;
+
+            music.currentTime = move_progress;
+        });
+
+
+        //if music end, call next song
+        music.addEventListener("ended",nextSong);
+
+        next.addEventListener("click", nextSong);
+        prev.addEventListener("click", prevSong);
+    </script>
+</body>
+</html>
